@@ -11,7 +11,7 @@
   "main": "monitor.js",
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node monitor_server.js"
   },
   "engines": {
       "node": "14.17.5"

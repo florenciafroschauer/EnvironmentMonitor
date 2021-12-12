@@ -1,1 +1,1 @@
-web: node ./monitor_server.js
+web: node monitor_server.js
