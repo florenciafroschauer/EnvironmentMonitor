@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Enviroment monitor</title>
+
+
+    <style>
+      #body {
+        background-color: lemonChiffon 
+      }
+
+      #heading {
+        font-family: times, Times New Roman, times-roman, georgia, serif;
+        margin: 1em 0 0.5em 0;
+        color: #343434;
+      	padding: 0px 0px 6px 0px;
+      	font-size: 51px;
+      	line-height: 44px;
+      	letter-spacing: -2px;
+      	font-weight: bold;
+      }
+
+      #subtitle {
+        margin: 1em 0 0.5em 0;
+  	    font-weight: normal;
+        position: relative;
+        font-size: 30px;
+        padding: 5px 15px;
+        color: #343434;
+        font-family: times, Times New Roman, times-roman, georgia, serif;
+        border-bottom: 1px solid rgba(53,86,129, 0.3);
+      }
+
+      #line-chart {
+        margin: 2em 0 2em 0;
+        width:1100px !important;
+        height:600px !important;
+        position: relative;
+        top: 50%;
+        left: 8%;
+        font-size: 20px;
+        font-family: times, Times New Roman, times-roman, georgia, serif;
+      }
+
+      #tempAvg, #humAvg, #lightAvg {
+        font-weight: normal;
+        position: relative;
+        font-size: 20px;
+        font-family: times, Times New Roman, times-roman, georgia, serif;
+      }
+
+      #alert {
+        margin: 1em 0 0.5em 0;
+  	    font-weight: normal;
+        position: relative;
+        font-size: 30px;
+        padding: 5px 15px;
+        color: #343434;
+        font-family: times, Times New Roman, times-roman, georgia, serif;
+        border-bottom: 1px solid rgba(53,86,129, 0.3);
+      }
+
+      #alertAmount {
+        font-weight: normal;
+        position: relative;
+        font-size: 20px;
+        font-family: times, Times New Roman, times-roman, georgia, serif;
+      }
+
+      ol {
+        line-height: 2;
+      }
+
+      ol li {
+        list-style-type: none;
+        counter-increment: item;
+        font-family: times, Times New Roman, times-roman, georgia, serif;
+      }
+
+      ol li:before {
+        content: counter(item);
+        margin-right: 5px;
+        font-size: 80%;
+        background-color: NavajoWhite;
+        color: #343434;
+        font-weight: bold;
+        padding: 3px 8px;
+        border-radius: 3px;
+      }
+
+      #line {
+        border-bottom: 3px solid #666;
+        padding: 0 0 15px 0;
+        margin-bottom: 8px;
+      }
+
+      #subject {
+        font-size: 15px;
+        font-family: times, Times New Roman, times-roman, georgia, serif;
+        float: left
+      }
+
+      #author {
+        font-size: 15px;
+        font-family: times, Times New Roman, times-roman, georgia, serif;
+        float: right
+      }
+
+      .buttonS {
+        background-color: #00B32C;
+        border: none;
+        color: white;
+        padding: 6px 10px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 15px;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        cursor: not-allowed;
+        transition: all .3s cubic-bezier(.05, .03, .35, 1);
+        touch-action: manipulation;
+        margin: 5px 5px 15px
+      }
+
+      .buttonU {
+        background-color: #DC3D2A;
+        border: none;
+        color: white;
+        padding: 6px 10px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 15px;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: all .3s cubic-bezier(.05, .03, .35, 1);
+        touch-action: manipulation;
+        margin: 5px 5px 15px
+
+      }
+
+      .buttonS:hover {
+        opacity: .7;
+      }
+
+      .buttonU:hover {
+        opacity: .7;
+      }
+
+    </style>
+
+    <script src = "https://unpkg.com/axios@0.21.1/dist/axios.min.js"></script>
+    <script src = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <script>
+
+      var alertsArray = []
+      function alerts() {
+        const url = 'http://192.168.0.21:3000/alert' // CAMBIAR IP
+        const resAlert = axios.get(url)
+        resAlert.then((response) => {
+          const alerts = response.data.alert
+          // generated alerts
+          let amount = alerts.length
+          document.getElementById('alertAmount').innerHTML += amount
+
+          for (var i = amount - 15; i < amount; i++) {
+            alertsArray.push(alerts[i])
+            document.getElementById('alertList').innerHTML += '<li>' +  alerts[i].title
+                  + ': ' + alerts[i].msg + ' a las ' + alerts[i].createdAt + '</li>'
+
+            var span = document.createElement('span');
+            span.id = alerts[i].id
+            if (alerts[i].state) {
+              span.innerHTML = '<button id="' + alerts[i].id +'" class = "buttonS" type="submit">Solved </button>';
+            } else if (!alerts[i].state) {
+              span.innerHTML = '<button id="' + alerts[i].id +'" class = "buttonU" type="submit" onclick="solve()">Unsolved </button>';
+            }
+            span.onclick = function() { solve(); }
+            document.getElementById('alertList').appendChild(span)
+          }
+        })
+      }
+
+      function solve() {
+        console.log(event.srcElement.id);
+        event.srcElement.innerHTML = 'Solved'
+        event.srcElement.style.backgroundColor = "#00B32C"
+        // window.location.reload();
+        let alert = alertsArray.find(x => x.id == event.srcElement.id)
+
+        axios.post('http://192.168.0.21:3000/solved', {
+            data: {
+              alert: alert,
+              id: alert.id
+            }
+          })
+      }
+
+      var light = []
+      var temp = []
+      var hum = []
+      var createdAt = []
+      function stats() {
+        const average = arr => arr.reduce((a,b) => a + b, 0) / arr.length;
+
+        const url = 'http://192.168.0.21:3000/light'
+        const resLight = axios.get(url)
+        resLight.then((response) => {
+          let data = response.data.light
+          for (var i = data.length - 50; i < data.length; i++) {
+            createdAt.push(data[i].createdAt)
+            light.push(data[i].light)
+          }
+
+          chart()
+          document.getElementById('lightAvg').innerHTML += average(light).toFixed(2) + '%'
+        })
+
+        const url1 = 'http://192.168.0.21:3000/temp'
+        const resTemp = axios.get(url1)
+        resTemp.then((response) => {
+          let data = response.data.temp
+          for (var i = data.length - 50; i < data.length; i++) {
+            temp.push(data[i].temp)
+          }
+          chart()
+          document.getElementById('tempAvg').innerHTML += average(temp).toFixed(2) + '°C'
+        })
+
+        const url2 = 'http://192.168.0.21:3000/hum'
+        const resHum = axios.get(url2)
+        resHum.then((response) => {
+          let data = response.data.hum
+          for (var i = data.length - 50; i < data.length; i++) {
+            hum.push(data[i].hum)
+          }
+          chart()
+          document.getElementById('humAvg').innerHTML += average(hum).toFixed(2) + '%'
+        })
+      }
+
+      function chart() {
+        if (light != null && temp != null && hum != null) {
+          let chart = new Chart(document.getElementById("line-chart"), {
+            type: 'line',
+            data: {
+              labels: createdAt,
+              datasets: [{
+                  data: light,
+                  label: "Light (%)",
+                  borderColor: "#3e95cd",
+                  fill: false,
+                  fontSize: 20,
+                  fontFamily: 'serif'
+                }, {
+                  data: temp,
+                  label: "Temperature (°C)",
+                  borderColor: "#8e5ea2",
+                  fill: false,
+                  fontSize: 20,
+                  fontFamily: 'serif'
+                }, {
+                  data: hum,
+                  label: "Humidity (%)",
+                  borderColor: "#3cba9f",
+                  fill: false,
+                  fontSize: 20,
+                  fontFamily: 'serif'
+                }
+              ]
+            },
+            options: {
+              title: {
+                display: true,
+                text: 'Enviroment monitor history',
+                fontSize: 30,
+                fontFamily: 'serif'
+              },
+              scales: {
+                yAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'Valor captado',
+                    fontSize: 20,
+                    fontFamily: 'serif'
+                  },
+                  ticks: {
+                    max: 100,
+                    beginAtZero: true,
+                    stepSize: 5
+                  }
+                }],
+                xAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'Tiempo',
+                    fontSize: 20,
+                    fontFamily: 'serif'
+                  }
+                }]
+              }
+            }
+          })
+        }
+      }
+
+    stats()
+    alerts()
+    </script>
+  </head>
+
+  <body id = "body">
+    <div>
+      <h1 id = "heading">Enviroment Monitor</h1>
+      <h2 id = "subtitle">Light, temperature and humidity sensors</h2>
+    </div>
+
+    <div>
+      <div>
+        <meta http-equiv = "refresh" content = "60">
+        <canvas id = "line-chart"></canvas>
+      </div>
+
+      <div>
+        <meta http-equiv = "refresh" content = "60">
+        <p id = 'tempAvg'>Average temperature level: </p>
+        <p id = 'humAvg'>Average humidity level: </p>
+        <p id = 'lightAvg'>Average light level: </p>
+      </div>
+
+      <div>
+        <h3 id = "alert">Alerts</h3>
+        <p id = 'alertAmount'>Generated alerts: </p>
+        <ol id = 'alertList'></ol>
+      </div>
+    </div>
+
+    <div>
+      <p id = "line"></p>
+      <p id = "author">By: Florencia Froschauer & Manuela Sorribes</p>
+      <p id = "subject">Electronica Digital II</p>
+
+    </div>
+  </body>
+</html>

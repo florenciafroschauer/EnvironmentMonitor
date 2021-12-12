@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "knex": "^0.95.14",
+    "objection": "^3.0.0"
+  },
+  "name": "monitor",
+  "version": "1.0.0",
+  "main": "monitor.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+      "node": "14.17.5"
+    },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
