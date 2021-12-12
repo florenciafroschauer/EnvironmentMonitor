@@ -156,8 +156,8 @@
 
       var alertsArray = []
       function alerts() {
-        // const url = 'http://192.168.0.21:3000/alert' // CAMBIAR IP
-        const url = 'https://aqueous-meadow-99131.herokuapp.com/'
+        const url = 'http://192.168.0.21:3000/alert' // CAMBIAR IP
+        // const url = 'https://aqueous-meadow-99131.herokuapp.com/'
         const resAlert = axios.get(url)
         resAlert.then((response) => {
           const alerts = response.data.alert
@@ -205,8 +205,8 @@
       function stats() {
         const average = arr => arr.reduce((a,b) => a + b, 0) / arr.length;
 
-        // const url = 'http://192.168.0.21:3000/light'
-        const url = 'https://aqueous-meadow-99131.herokuapp.com/'
+        const url = 'http://192.168.0.21:3000/light'
+        // const url = 'https://aqueous-meadow-99131.herokuapp.com/'
 
         const resLight = axios.get(url)
         resLight.then((response) => {
@@ -220,8 +220,8 @@
           document.getElementById('lightAvg').innerHTML += average(light).toFixed(2) + '%'
         })
 
-        // const url1 = 'http://192.168.0.21:3000/temp'
-        const url1 = 'https://aqueous-meadow-99131.herokuapp.com/'
+        const url1 = 'http://192.168.0.21:3000/temp'
+        // const url1 = 'https://aqueous-meadow-99131.herokuapp.com/'
 
         const resTemp = axios.get(url1)
         resTemp.then((response) => {
@@ -233,8 +233,8 @@
           document.getElementById('tempAvg').innerHTML += average(temp).toFixed(2) + '°C'
         })
 
-        // const url2 = 'http://192.168.0.21:3000/hum'
-        const url2 = 'https://aqueous-meadow-99131.herokuapp.com/'
+        const url2 = 'http://192.168.0.21:3000/hum'
+        // const url2 = 'https://aqueous-meadow-99131.herokuapp.com/'
 
         const resHum = axios.get(url2)
         resHum.then((response) => {
